@@ -26,4 +26,18 @@ class EtaireiaController {
     public function getAllEtaireia() {
         return $this->etaireiaModel->all();
     }
+
+    // function that sends email to all etaireies
+    public function sendEmailToAllEtaireies($subject, $message) {
+        // $etaireies = $this->getAllEtaireia();
+        // fake etaireies with only khatziar@gmail.com
+        $etaireies = [
+            ['email' => 'khatziar@gmail.com', 'onoma' => 'Kostas']
+        ];
+        foreach ($etaireies as $etaireia) {
+            if (!empty($etaireia['email'])) {
+                mail($etaireia['email'], $subject, $message);
+            }
+        }
+        }   
 }
