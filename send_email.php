@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/controllers/EtaireiaController.php';
+require_once __DIR__ . '/config/email.php';
 
 // Check if form was submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -11,36 +12,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         try {
             $controller = new EtaireiaController();
-            // $etaireies = $controller->getAllEtaireia();
-            // fake etaireies with only khatziar@gmail.com
-            $etaireies = [
-                ['email' => 'khatziar@gmail.com', 'onoma' => 'Kostas']
-            ];
-            $emailsSent = 0;
-            $errors = [];
 
-            foreach ($etaireies as $etaireia) {
-                if (!empty($etaireia['email'])) {
-                    $to = $etaireia['email'];
-                    $companyName = $etaireia['onoma'];
-
-                    // Customize message with company name
-                    $personalizedMessage = "Αγαπητοί κύριοι της εταιρείας " . $companyName . ",\n\n" . $message;
-
-                    $headers = "From: noreply@mathiteia.gr\r\n";
-                    $headers .= "Reply-To: noreply@mathiteia.gr\r\n";
-                    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-                    if (mail($to, $subject, $personalizedMessage, $headers)) {
-                        $emailsSent++;
-                    } else {
-                        $errors[] = "Αποτυχία αποστολής στην εταιρεία: " . $companyName;
-                    }
-                }
+            // For development - use fake data with your Gmail for testing
+            if (EmailConfig::DEVELOPMENT_MODE) {
+                // Use only your Gmail for testing
+                $etaireies = [
+                    ['email' => 'khatziar@gmail.com', 'onoma' => 'Test Company Development']
+                ];
+            } else {
+                // Use real database data when ready
+                // $etaireies = $controller->getAllEtaireia();
+                $etaireies = [
+                    ['email' => 'khatziar@gmail.com', 'onoma' => 'Kostas'],
+                    ['email' => 'khatziar@sch.gr', 'onoma' => 'KostasSCH']
+                ];
             }
 
-            if ($emailsSent > 0) {
-                $success = "Επιτυχής αποστολή σε $emailsSent εταιρείες!";
+            $emailSender = new EmailSender(true); // Enable SMTP for Gmail
+
+            // Personalization callback
+            $personalizeCallback = function ($message, $recipient) {
+                return "Αγαπητοί κύριοι της εταιρείας " . $recipient['onoma'] . ",\n\n" . $message;
+            };
+
+            $results = $emailSender->sendBulkEmails($etaireies, $subject, $message, $personalizeCallback);
+
+            if ($results['sent'] > 0) {
+                $success = "Επιτυχής αποστολή σε " . $results['sent'] . " εταιρείες!";
+            }
+
+            if (count($results['failed']) > 0) {
+                $errors = $results['errors'];
             }
         } catch (Exception $e) {
             $error = "Σφάλμα: " . $e->getMessage();
