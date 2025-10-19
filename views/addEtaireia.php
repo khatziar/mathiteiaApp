@@ -13,9 +13,11 @@
   </div>
 </nav>
 
+<?php require_once __DIR__ . '/../utils/csrf.php'; ?>
 <div class="container mt-4">
     <h1 class="mb-4">Add Etaireia</h1>
     <form action="../add_etaireia.php" method="post">
+    <?php echo csrf_input(); ?>
         <div class="mb-3">
             <label for="onoma" class="form-label">Όνομα</label>
             <input type="text" class="form-control" id="onoma" name="onoma" required>

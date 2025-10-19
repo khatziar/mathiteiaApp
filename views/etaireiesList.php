@@ -58,6 +58,7 @@
     </style>
 </head>
 <body>
+<?php require_once __DIR__ . '/../utils/csrf.php'; ?>
         <!-- Top navigation -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
@@ -123,6 +124,7 @@
                         <a href="views/editEtaireia.php?id=<?php echo urlencode($etaireia['id']); ?>" class="btn btn-sm btn-outline-primary me-1">Edit</a>
 
                         <form action="delete_etaireia.php" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                            <?php echo csrf_input(); ?>
                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($etaireia['id']); ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                         </form>

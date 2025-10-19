@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../controllers/EtaireiaController.php';
+require_once __DIR__ . '/../utils/csrf.php';
 
 $controller = new EtaireiaController();
 $id = $_GET['id'] ?? null;
@@ -38,6 +39,7 @@ try {
     <h1 class="mb-4">Edit Etaireia</h1>
     <form action="../edit_etaireia.php" method="post">
         <input type="hidden" name="id" value="<?php echo htmlspecialchars($etaireia['id']); ?>">
+        <?php echo csrf_input(); ?>
         <div class="mb-3">
             <label for="onoma" class="form-label">Όνομα</label>
             <input type="text" class="form-control" id="onoma" name="onoma" value="<?php echo htmlspecialchars($etaireia['onoma']); ?>" required>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/controllers/EtaireiaController.php';
+require_once __DIR__ . '/utils/csrf.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -19,6 +20,10 @@ $payload = [
 
 $controller = new EtaireiaController();
 try {
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        throw new Exception('Invalid CSRF token');
+    }
+
     $updated = $controller->updateEtaireia($id, $payload);
     header('Location: index.php?updated=1&id=' . urlencode($id));
     exit;

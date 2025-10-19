@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/controllers/EtaireiaController.php';
+require_once __DIR__ . '/utils/csrf.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -18,6 +19,10 @@ $payload = [
 
 $controller = new EtaireiaController();
 try {
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        throw new Exception('Invalid CSRF token');
+    }
+
     $insertId = $controller->createEtaireia($payload);
     // Redirect back with success
     header('Location: index.php?created=1&id=' . urlencode($insertId));
